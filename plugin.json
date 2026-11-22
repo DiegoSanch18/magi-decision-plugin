@@ -1,0 +1,22 @@
+{
+  "name": "magi",
+  "displayName": "MAGI Decision System (RITSUKO-0)",
+  "version": "1.0.0",
+  "description": "Sistema multi-agente de deliberación y toma de decisiones (MELCHIOR-1, BALTHAZAR-2, CASPER-3) moderado por RITSUKO-0 con capacidades simétricas (ALL_MAGI_TOOLS), lentes cognitivas diferenciadas y quórum 2/3.",
+  "logo": "assets/logo.svg",
+  "suggestedPrompts": [
+    "/magiMediador Evaluar si debemos migrar nuestro backend monolítico a microservicios este trimestre",
+    "Deliberar con el sistema MAGI la viabilidad, riesgos y costo de oportunidad de lanzar un nuevo producto IA",
+    "Ejecutar auditoría cruzada MAGI sobre presupuesto en Google Sheets, políticas en Google Drive y visión en VISION.md"
+  ],
+  "author": {
+    "name": "Diego",
+    "url": "https://github.com/DiegoSanch18"
+  },
+  "homepage": "https://github.com/DiegoSanch18/magi-decision-plugin#readme",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/DiegoSanch18/magi-decision-plugin.git"
+  },
+  "disabled": false
+}

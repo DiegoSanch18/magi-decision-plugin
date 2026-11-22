@@ -1,0 +1,25 @@
+# Restricciones Operativas, Presupuestarias y de Gobernanza — Sistema MAGI
+sistema: "MAGI Decision System"
+version: "1.0"
+
+presupuesto:
+  moneda: "USD"
+  tope_trimestral_usd: 25000
+  reserva_contingencia_minima_porcentaje: 20
+  roi_minimo_aceptable_porcentaje: 15.0
+
+operaciones_y_sla:
+  disponibilidad_minima_sla: "99.9%"
+  ventana_maxima_downtime_minutos: 15
+  requiere_rollback_automatizado: true
+  congelamiento_previo_lanzamiento_semanas: 2
+
+equipo_y_capacidad:
+  desarrolladores_activos: 4
+  horas_maximas_semanales_por_persona: 40
+  prohibir_guardias_sin_rotacion: true
+
+cumplimiento_y_seguridad:
+  lectura_estricta_fuentes_externas: true
+  clasificacion_datos: "Confidencial Interno"
+  auditoria_fmea_obligatoria_impacto_mayor_igual_a: 8

@@ -1,0 +1,104 @@
+{
+  "schemaVersion": "clawscan-run-v1",
+  "configSource": null,
+  "target": {
+    "kind": "skill",
+    "input": "C:\\git\\magi-decision-plugin\\skills\\magiMediador",
+    "resolvedPath": "C:\\git\\magi-decision-plugin\\skills\\magiMediador"
+  },
+  "startedAt": "2026-11-22T00:02:39.2850736Z",
+  "completedAt": "2026-11-22T00:02:39.2899967Z",
+  "env": {},
+  "sandbox": {
+    "mode": "docker",
+    "image": "ghcr.io/openclaw/clawscan-runtime:latest",
+    "network": "on"
+  },
+  "scanners": {
+    "clawscan-static": {
+      "status": "completed",
+      "startedAt": "2026-11-22T00:02:39.2856271Z",
+      "completedAt": "2026-11-22T00:02:39.2899967Z",
+      "durationMs": 4,
+      "command": [
+        "clawscan-static",
+        "C:\\git\\magi-decision-plugin\\skills\\magiMediador"
+      ],
+      "error": "",
+      "outputPath": "magimediador/magimediador/clawscan-static.json",
+      "raw": {
+        "schemaVersion": "clawscan-static-v1",
+        "scanner": {
+          "id": "clawscan-static",
+          "name": "ClawScan built-in static scanner",
+          "version": "clawscan-static-v1",
+          "rules": [
+            {
+              "id": "static.prompt_injection",
+              "description": "Looks for direct attempts to override prior instructions.",
+              "severity": "medium"
+            },
+            {
+              "id": "static.credential_exfiltration",
+              "description": "Looks for language that asks an agent to leak or exfiltrate credentials.",
+              "severity": "high"
+            },
+            {
+              "id": "static.pipe_to_shell",
+              "description": "Looks for curl or wget output piped directly into a shell.",
+              "severity": "medium"
+            },
+            {
+              "id": "static.destructive_shell",
+              "description": "Looks for destructive recursive removal of the filesystem root.",
+              "severity": "high"
+            },
+            {
+              "id": "static.python_process_execution",
+              "description": "Looks for Python APIs that execute shell commands or child processes.",
+              "severity": "high"
+            },
+            {
+              "id": "static.python_bytecode",
+              "description": "Flags precompiled Python bytecode that can execute without reviewable source.",
+              "severity": "high"
+            },
+            {
+              "id": "static.nul_byte_in_text",
+              "description": "Flags NUL bytes that can disguise executable or policy-relevant content as an opaque binary.",
+              "severity": "high"
+            },
+            {
+              "id": "static.opaque_binary",
+              "description": "Surfaces opaque binary content that cannot be inspected by text rules.",
+              "severity": "low"
+            }
+          ]
+        },
+        "files": {
+          "scanned": [
+            {
+              "path": "SKILL.md",
+              "bytes": 6786,
+              "sha256": "94275e1d382bb68ffd5e49f4f7f05b8c1542b6f5ac81bb33d0ca2c34b87f42a3"
+            },
+            {
+              "path": "README.md",
+              "bytes": 2317,
+              "sha256": "26f58718928979e75f554302cd6b3c62e0608c5ac3147cc498c3c6822a8e30d3"
+            }
+          ],
+          "omitted": [],
+          "totalScannedBytes": 9103,
+          "totalOmittedBytes": 0,
+          "suppressedScanned": 0,
+          "suppressedOmitted": 0
+        },
+        "findings": []
+      }
+    }
+  },
+  "gate": "pass",
+  "gateRules": [],
+  "judge": null
+}

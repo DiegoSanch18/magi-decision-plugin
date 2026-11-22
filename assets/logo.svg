@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128">
+  <defs>
+    <style>
+      .bg { fill: #0d1117; rx: 20px; }
+      .frame { fill: none; stroke: #ff6b00; stroke-width: 2.5; }
+      .hex-melchior { fill: #112233; stroke: #00e5ff; stroke-width: 2.5; }
+      .hex-balthazar { fill: #1a162b; stroke: #ff3d71; stroke-width: 2.5; }
+      .hex-casper { fill: #14281d; stroke: #00e676; stroke-width: 2.5; }
+      .core-ritsuko { fill: #ff6b00; stroke: #ffd600; stroke-width: 2; }
+      .link { stroke: #ff9100; stroke-width: 1.8; stroke-dasharray: 2 2; }
+      .label { font-family: monospace; font-size: 9px; font-weight: bold; fill: #ffffff; text-anchor: middle; dominant-baseline: central; }
+      .sub { font-family: monospace; font-size: 7px; fill: #ffd600; text-anchor: middle; }
+    </style>
+  </defs>
+  <!-- Background with ~10% safe margin around inner elements -->
+  <rect class="bg" x="8" y="8" width="112" height="112" rx="18" />
+  <rect class="frame" x="12" y="12" width="104" height="104" rx="14" />
+
+  <!-- Connecting bus lines to RITSUKO-0 mediator core -->
+  <line class="link" x1="64" y1="36" x2="64" y2="66" />
+  <line class="link" x1="37" y1="84" x2="64" y2="66" />
+  <line class="link" x1="91" y1="84" x2="64" y2="66" />
+
+  <!-- Top Monolith: BALTHAZAR-2 (La Madre) -->
+  <polygon class="hex-balthazar" points="64,18 82,27 82,45 64,54 46,45 46,27" />
+  <text class="label" x="64" y="36">B-2</text>
+
+  <!-- Bottom-Left Monolith: MELCHIOR-1 (La Ingeniera) -->
+  <polygon class="hex-melchior" points="37,66 55,75 55,93 37,102 19,93 19,75" />
+  <text class="label" x="37" y="84">M-1</text>
+
+  <!-- Bottom-Right Monolith: CASPER-3 (La Mujer) -->
+  <polygon class="hex-casper" points="91,66 109,75 109,93 91,102 73,93 73,75" />
+  <text class="label" x="91" y="84">C-3</text>
+
+  <!-- Central Mediator Hub: RITSUKO-0 -->
+  <circle class="core-ritsuko" cx="64" cy="66" r="10" />
+  <text class="label" x="64" y="66" fill="#0d1117">R-0</text>
+
+  <!-- Footer tag -->
+  <text class="sub" x="64" y="110">MAGI SYSTEM 2/3</text>
+</svg>

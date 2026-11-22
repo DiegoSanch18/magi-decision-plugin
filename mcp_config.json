@@ -1,0 +1,14 @@
+{
+  "mcpServers": {
+    "magi-decision-system": {
+      "command": "C:\\git\\magi-decision-plugin\\.venv\\Scripts\\python.exe",
+      "args": [
+        "C:\\git\\magi-decision-plugin\\mcp_server.py"
+      ],
+      "env": {
+        "PYTHONIOENCODING": "utf-8",
+        "MAGI_WORKSPACE_DIR": "C:\\git\\magi-decision-plugin"
+      }
+    }
+  }
+}
