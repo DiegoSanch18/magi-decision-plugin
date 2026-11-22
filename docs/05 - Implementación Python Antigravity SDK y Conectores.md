@@ -1,10 +1,10 @@
-# Implementación con Google Antigravity SDK (`google-antigravity`) y Conectores Simétricos
+# Implementación con Google Antigravity SDK (`google-antigravity`) y Aislamiento de Dominio
 
-Este documento contiene el código Python completo para ejecutar el **Sistema MAGI + Mediador (`RITSUKO-0`)** utilizando las primitivas de `google-antigravity` (`Agent`, `LocalAgentConfig`, `types.SubagentConfig`, `@post_tool_call`) y `FastMCP`, garantizando **capacidades simétricas (`ALL_MAGI_TOOLS`)** en los 3 nodos deliberativos con **lentes cognitivas diferenciadas**, así como soporte dual para **Modo A (FastMCP + SDK)** y **Modo B (Orquestación Nativa en Antigravity IDE)**.
+Este documento contiene el código Python completo para ejecutar el **Sistema MAGI + Mediador (`RITSUKO-0`)** utilizando las primitivas de `google-antigravity` (`Agent`, `LocalAgentConfig`, `types.SubagentConfig`, `@post_tool_call`) y `FastMCP`, garantizando **aislamiento estricto de herramientas por dominio** (`MELCHIOR_TOOLS`, `BALTHAZAR_TOOLS`, `CASPER_TOOLS`) para eliminar sesgos cognitivos en la Ronda 1, así como soporte dual para **Modo A (FastMCP + SDK)** y **Modo B (Orquestación Nativa en Antigravity IDE)**.
 
 ---
 
-## 1. Herramientas Cuantitativas y Técnicas (`tools/melchior_tools.py`)
+## 1. Conector Exclusivo de Melchior-1 (`tools/melchior_tools.py`)
 
 ```python
 import os
@@ -67,7 +67,7 @@ MELCHIOR_TOOLS = [leer_metricas_sheet, calcular_viabilidad_y_roi, inspeccionar_r
 
 ---
 
-## 2. Herramientas Normativas y de Riesgo (`tools/balthazar_tools.py`)
+## 2. Conector Exclusivo de Balthazar-2 (`tools/balthazar_tools.py`)
 
 ```python
 import os
@@ -131,7 +131,7 @@ BALTHAZAR_TOOLS = [buscar_y_leer_doc_drive, auditar_riesgos_y_fallos, verificar_
 
 ---
 
-## 3. Herramientas Estratégicas y de Factor Humano (`tools/casper_tools.py`)
+## 3. Conector Exclusivo de Casper-3 (`tools/casper_tools.py`)
 
 ```python
 import os
@@ -173,9 +173,9 @@ CASPER_TOOLS = [consultar_bitacora_local, medir_costo_oportunidad, analizar_impa
 
 ---
 
-## 4. Orquestador Principal con Capacidades Simétricas (`engine/magi_mediator.py`)
+## 4. Orquestador Principal con Aislamiento Estricto por Nodo (`engine/magi_mediator.py`)
 
-> **Principio de Simetría (`ALL_MAGI_TOOLS`):** Tanto el agente mediador padre (`LocalAgentConfig`) como los tres subagentes (`MELCHIOR-1`, `BALTHAZAR-2`, `CASPER-3`) reciben el arsenal completo `ALL_MAGI_TOOLS = MELCHIOR_TOOLS + BALTHAZAR_TOOLS + CASPER_TOOLS`. La diferenciación radica exclusivamente en su `description` y `system_instructions` (lente cognitiva).
+> **Nota clave del Antigravity SDK:** Todo *tool* asignado a un subagente (`types.SubagentConfig`) debe estar registrado también en la lista `tools=[...]` del agente padre (`LocalAgentConfig`), mientras que cada subagente recibe **exclusivamente su subconjunto aislado de 3 herramientas** (`MELCHIOR_TOOLS`, `BALTHAZAR_TOOLS` o `CASPER_TOOLS`).
 
 ```python
 import asyncio
@@ -184,7 +184,25 @@ from pydantic import BaseModel
 from google.antigravity import Agent, LocalAgentConfig, types
 from google.antigravity.hooks import post_tool_call
 
-from tools import ALL_MAGI_TOOLS
+from tools.melchior_tools import MELCHIOR_TOOLS
+from tools.balthazar_tools import BALTHAZAR_TOOLS
+from tools.casper_tools import CASPER_TOOLS
+
+NODE_ALLOWED_TOOLS: dict[str, set[str]] = {
+    "melchior-ingeniera": {fn.__name__ for fn in MELCHIOR_TOOLS},
+    "balthazar-madre": {fn.__name__ for fn in BALTHAZAR_TOOLS},
+    "casper-mujer": {fn.__name__ for fn in CASPER_TOOLS},
+}
+
+def validar_aislamiento_herramienta(nodo: str, nombre_herramienta: str) -> tuple[bool, str]:
+    if not nodo:
+        return True, "OK"
+    permitidas = NODE_ALLOWED_TOOLS.get(nodo)
+    if permitidas is None:
+        return False, f"Nodo desconocido: {nodo}"
+    if nombre_herramienta not in permitidas:
+        return False, f"Violación de aislamiento: '{nodo}' no tiene permiso para invocar '{nombre_herramienta}'."
+    return True, "OK"
 
 class DictamenNodo(BaseModel):
     nodo: str
@@ -213,33 +231,34 @@ def crear_subagentes_magi() -> list[types.SubagentConfig]:
     return [
         types.SubagentConfig(
             name="melchior-ingeniera",
-            description="MELCHIOR-1 (Lente Ingeniera/Científica): Evalúa lógica, métricas en Google Sheets, ROI y viabilidad técnica usando ALL_MAGI_TOOLS.",
+            description="MELCHIOR-1: Evalúa lógica, métricas en Google Sheets, ROI y viabilidad técnica.",
             system_instructions=leer_skill_body(".agents/skills/melchior-ingeniera"),
-            tools=list(ALL_MAGI_TOOLS),
+            tools=list(MELCHIOR_TOOLS),
         ),
         types.SubagentConfig(
             name="balthazar-madre",
-            description="BALTHAZAR-2 (Lente Madre/Preservación): Evalúa seguridad, documentos en Google Drive, riesgos FMEA y límites en constraints.yaml usando ALL_MAGI_TOOLS.",
+            description="BALTHAZAR-2: Evalúa seguridad, documentos en Google Drive, riesgos y sostenibilidad.",
             system_instructions=leer_skill_body(".agents/skills/balthazar-madre"),
-            tools=list(ALL_MAGI_TOOLS),
+            tools=list(BALTHAZAR_TOOLS),
         ),
         types.SubagentConfig(
             name="casper-mujer",
-            description="CASPER-3 (Lente Mujer/Propósito): Evalúa visión en VISION.md, costo de oportunidad y factor humano usando ALL_MAGI_TOOLS.",
+            description="CASPER-3: Evalúa visión en Markdown local, costo de oportunidad y factor humano.",
             system_instructions=leer_skill_body(".agents/skills/casper-mujer"),
-            tools=list(ALL_MAGI_TOOLS),
+            tools=list(CASPER_TOOLS),
         ),
     ]
 
 async def ejecutar_deliberacion_magi(dilema: str, contexto: str = "") -> str:
     """Ejecuta el ciclo completo: Mediador -> Ronda 1 Paralela -> Careo Ronda 2 -> Veredicto 2/3."""
     TRAZA_HERRAMIENTAS.clear()
+    todas_las_tools = list(MELCHIOR_TOOLS) + list(BALTHAZAR_TOOLS) + list(CASPER_TOOLS)
 
     config_mediador = LocalAgentConfig(
         model="gemini-3.8-flash",
         system_instructions=leer_skill_body(".agents/skills/magi-mediador"),
         skills_paths=[".agents/skills/magi-mediador"],
-        tools=list(ALL_MAGI_TOOLS),
+        tools=todas_las_tools,
         subagents=crear_subagentes_magi(),
         hooks=[auditar_llamada_herramienta],
         save_dir="./storage/magi_sessions",
@@ -251,7 +270,7 @@ async def ejecutar_deliberacion_magi(dilema: str, contexto: str = "") -> str:
         "Ejecuta tu protocolo completo de mediación en 4 fases:\n"
         "1. Encuadra el dilema.\n"
         "2. Invoca en paralelo a los subagentes 'melchior-ingeniera', 'balthazar-madre' y 'casper-mujer' "
-        "exigiendo que cada uno use el arsenal simétrico ALL_MAGI_TOOLS desde su lente cognitiva y devuelva su DictamenNodo en JSON.\n"
+        "exigiendo que cada uno use sus herramientas exclusivas y devuelva su DictamenNodo en JSON.\n"
         "3. Analiza las fricciones entre sus evidencias, formula una pregunta de careo dirigida a cada uno "
         "y ejecútalos en Ronda 2 para que confirmen o modifiquen su voto.\n"
         "4. Emite el Veredicto Final MAGI con el marcador de quórum (2/3) y el plan de acción."
@@ -266,14 +285,14 @@ async def ejecutar_deliberacion_magi(dilema: str, contexto: str = "") -> str:
 
 ---
 
-## 5. Servidor MCP Dual (`mcp_server.py`) para Antigravity App / IDE
+## 5. Servidor MCP Dual con Guardián de Aislamiento (`mcp_server.py`)
 
-Expone tanto `deliberar_con_magi` (Modo A — ciclo completo por SDK) como `ejecutar_herramienta_magi` (Modo B — ejecución directa de cualquiera de las 9 herramientas de `ALL_MAGI_TOOLS` por subagentes nativos con registro en `TRAZA_HERRAMIENTAS`):
+Expone tanto `deliberar_con_magi` (Modo A) como `ejecutar_herramienta_magi` (Modo B con validación obligatoria de `nodo` contra `NODE_ALLOWED_TOOLS`):
 
 ```python
 from mcp.server.fastmcp import FastMCP
-from engine.magi_mediator import ejecutar_deliberacion_magi, TRAZA_HERRAMIENTAS
-from tools import TOOL_REGISTRY
+from engine.magi_mediator import ejecutar_deliberacion_magi, TRAZA_HERRAMIENTAS, validar_aislamiento_herramienta
+from tools import MAGI_TOOL_REGISTRY
 
 mcp = FastMCP("magi-decision-system")
 
@@ -287,15 +306,28 @@ async def deliberar_con_magi(dilema: str, contexto: str = "") -> dict:
     }
 
 @mcp.tool()
-async def ejecutar_herramienta_magi(nombre_herramienta: str, argumentos: dict | None = None) -> dict:
-    """Ejecuta cualquiera de las 9 herramientas simétricas de ALL_MAGI_TOOLS y registra la llamada en TRAZA_HERRAMIENTAS."""
-    fn = TOOL_REGISTRY.get(nombre_herramienta)
+async def ejecutar_herramienta_magi(nombre_herramienta: str, argumentos: dict | None = None, nodo: str = "") -> dict:
+    """Ejecuta una herramienta del Sistema MAGI validando el aislamiento estricto de dominio por nodo."""
+    valido, motivo = validar_aislamiento_herramienta(nodo, nombre_herramienta)
+    if not valido:
+        return {
+            "error": motivo,
+            "aislamiento_violado": True,
+            "nodo": nodo,
+            "herramienta": nombre_herramienta,
+        }
+    fn = MAGI_TOOL_REGISTRY.get(nombre_herramienta)
     if fn is None:
         return {"error": f"Herramienta desconocida: {nombre_herramienta}"}
     args = argumentos or {}
     resultado = fn(**args)
-    TRAZA_HERRAMIENTAS.append({"herramienta": nombre_herramienta, "args": args})
-    return {"herramienta": nombre_herramienta, "resultado": resultado}
+    TRAZA_HERRAMIENTAS.append({
+        "herramienta": nombre_herramienta,
+        "args": args,
+        "nodo": nodo or "directo",
+        "aislamiento_valido": True,
+    })
+    return {"herramienta": nombre_herramienta, "nodo": nodo or "directo", "resultado": resultado}
 
 if __name__ == "__main__":
     mcp.run()

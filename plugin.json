@@ -2,7 +2,7 @@
   "name": "magi",
   "displayName": "MAGI Decision System (RITSUKO-0)",
   "version": "1.0.0",
-  "description": "Sistema multi-agente de deliberación y toma de decisiones (MELCHIOR-1, BALTHAZAR-2, CASPER-3) moderado por RITSUKO-0 con capacidades simétricas (ALL_MAGI_TOOLS), lentes cognitivas diferenciadas y quórum 2/3.",
+  "description": "Sistema multi-agente de deliberación y toma de decisiones (MELCHIOR-1, BALTHAZAR-2, CASPER-3) moderado por RITSUKO-0 con aislamiento estricto de herramientas por dominio para evitar sesgos, careo de evidencia asimétrica y quórum 2/3.",
   "logo": "assets/logo.svg",
   "suggestedPrompts": [
     "/magiMediador Evaluar si debemos migrar nuestro backend monolítico a microservicios este trimestre",

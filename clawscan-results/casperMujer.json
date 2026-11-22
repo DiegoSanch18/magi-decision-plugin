@@ -6,8 +6,8 @@
     "input": "C:\\git\\magi-decision-plugin\\skills\\casperMujer",
     "resolvedPath": "C:\\git\\magi-decision-plugin\\skills\\casperMujer"
   },
-  "startedAt": "2026-11-22T00:02:40.0398474Z",
-  "completedAt": "2026-11-22T00:02:40.0436227Z",
+  "startedAt": "2026-11-22T00:18:43.1659042Z",
+  "completedAt": "2026-11-22T00:18:43.1691748Z",
   "env": {},
   "sandbox": {
     "mode": "docker",
@@ -17,9 +17,9 @@
   "scanners": {
     "clawscan-static": {
       "status": "completed",
-      "startedAt": "2026-11-22T00:02:40.0403904Z",
-      "completedAt": "2026-11-22T00:02:40.0436227Z",
-      "durationMs": 3,
+      "startedAt": "2026-11-22T00:18:43.1664766Z",
+      "completedAt": "2026-11-22T00:18:43.1691748Z",
+      "durationMs": 2,
       "command": [
         "clawscan-static",
         "C:\\git\\magi-decision-plugin\\skills\\casperMujer"
@@ -79,17 +79,17 @@
           "scanned": [
             {
               "path": "SKILL.md",
-              "bytes": 4807,
-              "sha256": "735984137ceb049f48c6abb498ed62134b0fe784438e4e7d4b2c16caa4590e0a"
+              "bytes": 4044,
+              "sha256": "586c497d361cfee20242b0dc87dc9eb8e868084f5a9d2926ab5edf6867117b18"
             },
             {
               "path": "README.md",
-              "bytes": 1629,
-              "sha256": "e6eb2cd39ceecc6214d52962c58d0e0d24783f4042297d3010462addc06bb970"
+              "bytes": 1616,
+              "sha256": "8fd89322ffbbb6ff71c4910d87cbaccd561b22db5214b18ce5ed0309232fddef"
             }
           ],
           "omitted": [],
-          "totalScannedBytes": 6436,
+          "totalScannedBytes": 5660,
           "totalOmittedBytes": 0,
           "suppressedScanned": 0,
           "suppressedOmitted": 0

@@ -1,8 +1,8 @@
-"""CLI de ejecución de herramientas MAGI para Modo B (subagentes nativos Antigravity IDE).
+"""CLI de ejecución de herramientas MAGI con validación de aislamiento por nodo (Modo B).
 
 Uso:
     python -m tools.cli --list
-    python -m tools.cli <tool_name> --json-args '{"param": "valor"}'
+    python -m tools.cli --node melchior-ingeniera calcular_viabilidad_y_roi --json-args '{"costo_estimado": 1000, "retorno_esperado": 1500, "horas_esfuerzo": 20}'
 """
 
 import argparse
@@ -12,6 +12,18 @@ import sys
 from typing import Any
 
 from tools import ALL_MAGI_TOOLS, MAGI_TOOL_REGISTRY
+from engine.magi_mediator import (
+    NODE_ALLOWED_TOOLS,
+    normalizar_nombre_nodo,
+    validar_aislamiento_herramienta,
+)
+
+
+def _dominio_de_herramienta(nombre_fn: str) -> str:
+    for nodo, permitidas in NODE_ALLOWED_TOOLS.items():
+        if nombre_fn in permitidas:
+            return nodo
+    return "compartido"
 
 
 def listar_herramientas() -> dict[str, Any]:
@@ -29,11 +41,16 @@ def listar_herramientas() -> dict[str, Any]:
         catalogo.append(
             {
                 "nombre": fn.__name__,
+                "nodo_exclusivo": _dominio_de_herramienta(fn.__name__),
                 "descripcion": (fn.__doc__ or "").strip(),
                 "parametros": parametros,
             }
         )
-    return {"total_herramientas": len(catalogo), "herramientas": catalogo}
+    return {
+        "total_herramientas": len(catalogo),
+        "aislamiento_por_nodo": {k: sorted(v) for k, v in NODE_ALLOWED_TOOLS.items()},
+        "herramientas": catalogo,
+    }
 
 
 def ejecutar_cli(argv: list[str] | None = None) -> int:
@@ -44,7 +61,7 @@ def ejecutar_cli(argv: list[str] | None = None) -> int:
 
     parser = argparse.ArgumentParser(
         prog="python -m tools.cli",
-        description="Ejecuta cualquiera de las 9 herramientas simétricas del Sistema MAGI (`ALL_MAGI_TOOLS`).",
+        description="Ejecuta herramientas del Sistema MAGI respetando el aislamiento de dominio por nodo (`--node`).",
     )
     parser.add_argument(
         "tool_name",
@@ -52,14 +69,19 @@ def ejecutar_cli(argv: list[str] | None = None) -> int:
         help="Nombre de la herramienta MAGI a ejecutar.",
     )
     parser.add_argument(
+        "--node",
+        default="",
+        help="Identificador del nodo que invoca la herramienta (`melchior-ingeniera`, `balthazar-madre`, `casper-mujer`).",
+    )
+    parser.add_argument(
         "--json-args",
         default="{}",
-        help="Objeto JSON con los argumentos de la herramienta (ej. '{\"costo_estimado\": 1000, \"retorno_esperado\": 1500, \"horas_esfuerzo\": 20}').",
+        help="Objeto JSON con los argumentos de la herramienta.",
     )
     parser.add_argument(
         "--list",
         action="store_true",
-        help="Lista las 9 herramientas disponibles en ALL_MAGI_TOOLS y sus firmas.",
+        help="Lista las 9 herramientas disponibles y su asignación exclusiva por nodo.",
     )
 
     args = parser.parse_args(argv)
@@ -80,6 +102,18 @@ def ejecutar_cli(argv: list[str] | None = None) -> int:
         print(json.dumps(error_payload, ensure_ascii=False, indent=2))
         return 1
 
+    if args.node:
+        valido, motivo = validar_aislamiento_herramienta(args.node, args.tool_name)
+        if not valido:
+            isolation_payload = {
+                "error": motivo,
+                "aislamiento_violado": True,
+                "nodo": args.node,
+                "herramienta": args.tool_name,
+            }
+            print(json.dumps(isolation_payload, ensure_ascii=False, indent=2))
+            return 1
+
     try:
         parsed_kwargs = json.loads(args.json_args) if args.json_args else {}
         if not isinstance(parsed_kwargs, dict):
@@ -96,8 +130,11 @@ def ejecutar_cli(argv: list[str] | None = None) -> int:
 
     try:
         resultado = fn(**parsed_kwargs)
+        nodo_tag = normalizar_nombre_nodo(args.node) if args.node else "directo"
         salida = {
             "herramienta": args.tool_name,
+            "nodo": nodo_tag,
+            "aislamiento_valido": True,
             "argumentos": parsed_kwargs,
             "resultado": resultado,
         }

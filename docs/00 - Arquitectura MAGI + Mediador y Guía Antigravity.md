@@ -4,14 +4,14 @@ Este paquete contiene la especificación completa y lista para implementar de un
 
 ---
 
-## 1. Arquitectura de 4 Agentes: Capacidades Simétricas (`ALL_MAGI_TOOLS`) y Lentes Cognitivas
+## 1. Arquitectura de 4 Agentes: Aislamiento Estricto por Dominio y Mediador Central
 
-A diferencia de un debate plano entre tres agentes, la incorporación de un **Mediador Central (`RITSUKO-0`)** evita cámaras de eco y dirige el careo antes de emitir el veredicto por mayoría (`2/3`). Los **3 Nodos Deliberativos (`MELCHIOR-1`, `BALTHAZAR-2`, `CASPER-3`)** poseen **exactamente las mismas capacidades operativas y acceso al arsenal completo de 9 herramientas (`ALL_MAGI_TOOLS`)**, diferenciándose exclusivamente por su **lente cognitiva y filosófica**:
+A diferencia de un debate plano entre tres agentes, la incorporación de un **Mediador Central (`RITSUKO-0`)** evita cámaras de eco, traduce evidencia asimétrica entre dominios y dirige el careo antes de emitir el veredicto por mayoría (`2/3`). Cada nodo (`MELCHIOR-1`, `BALTHAZAR-2`, `CASPER-3`) posee **aislamiento estricto de herramientas y fuentes de datos en la Ronda 1** para eliminar el ruido inter-dominio y prevenir sesgos cognitivos:
 
 ```text
                         ┌──────────────────────────────────┐
                         │     USUARIO / ANTIGRAVITY IDE    │
-                        │  Comando: /magiMediador o MCP    │
+                        │   Comando: /magiMediador o MCP   │
                         └─────────────────┬────────────────┘
                                           │ Dilema bruto
                                           ▼
@@ -28,19 +28,20 @@ A diferencia de un debate plano entre tres agentes, la incorporación de un **Me
 │   MELCHIOR-1    │              │   BALTHAZAR-2   │              │    CASPER-3     │
 │  (La Ingeniera) │              │   (La Madre)    │              │   (La Mujer)    │
 ├─────────────────┤              ├─────────────────┤              ├─────────────────┤
-│ • Lente: Lógica,│              │ • Lente: Riesgo,│              │ • Lente: Visión,│
-│   ROI y Técnica │              │   FMEA y Límites│              │   Timing/Humano │
-│ • ALL_MAGI_TOOLS│              │ • ALL_MAGI_TOOLS│              │ • ALL_MAGI_TOOLS│
+│ • Google Sheets │              │ • Google Drive  │              │ • Markdown Local│
+│ • ROI / Métricas│              │ • Riesgos/Normas│              │ • Visión/Notas  │
+│ • MELCHIOR_TOOLS│              │ •BALTHAZAR_TOOLS│              │ • CASPER_TOOLS  │
+│ • Thinking: HIGH│              │ • Thinking: MED │              │ • Thinking: LOW │
 └─────────────────┘              └─────────────────┘              └─────────────────┘
 ```
 
 ### Ciclo de Deliberación en 4 Fases y Ejecución Dual (Modo A y Modo B)
-- **Modo A (FastMCP + Antigravity SDK):** Mediante la herramienta MCP `deliberar_con_magi(dilema, contexto)`, que instancia `LocalAgentConfig` y los 3 `SubagentConfig` con `tools=ALL_MAGI_TOOLS` y el hook `@post_tool_call`.
-- **Modo B (Orquestación Nativa en Antigravity IDE):** Mediante `/magiMediador`, donde el coordinador invoca a los subagentes declarativos (`melchior-ingeniera`, `balthazar-madre`, `casper-mujer`) con `Model: "flash"`, quienes ejecutan cualquiera de las 9 herramientas vía MCP `ejecutar_herramienta_magi` o CLI `python -m tools.cli`.
+- **Modo A (FastMCP + Antigravity SDK):** Mediante la herramienta MCP `deliberar_con_magi(dilema, contexto)`, que instancia `LocalAgentConfig` (con `ALL_MAGI_TOOLS` en el padre) y los 3 `SubagentConfig` aislados (`MELCHIOR_TOOLS`, `BALTHAZAR_TOOLS`, `CASPER_TOOLS`).
+- **Modo B (Orquestación Nativa en Antigravity IDE):** Mediante `/magiMediador`, donde el coordinador invoca a los subagentes declarativos (`melchior-ingeniera`, `balthazar-madre`, `casper-mujer` con `Model: "flash"`), quienes ejecutan únicamente sus 3 herramientas exclusivas vía MCP `ejecutar_herramienta_magi(..., nodo="<nodo>")` o CLI `python -m tools.cli --node <nodo>`.
 
 1. **Fase 0 — Encuadre (Mediador):** `RITSUKO-0` limpia el dilema del usuario, identifica variables faltantes y redacta un *Brief Neutral* para que los 3 nodos evalúen exactamente el mismo problema.
-2. **Fase 1 — Investigación Aislada (Ronda 1 en Paralelo):** Los 3 subagentes se ejecutan de forma concurrente sin verse entre sí. Cada uno consulta el arsenal simétrico `ALL_MAGI_TOOLS` (Sheets, ROI, infraestructura, Drive, FMEA, `constraints.yaml`, `VISION.md`, costo de oportunidad e impacto humano) desde su lente cognitiva y emite su dictamen inicial (`DictamenNodo`).
-3. **Fase 2 — Careo Moderado (Mediador → Ronda 2):** `RITSUKO-0` analiza las contradicciones entre los hallazgos (ej. *Melchior muestra ROI positivo en Sheets, pero Balthazar encontró un límite contractual en Drive/`constraints.yaml`*) y envía **preguntas cruzadas dirigidas** a cada nodo para una segunda ronda de réplica.
+2. **Fase 1 — Investigación Aislada (Ronda 1 en Paralelo):** Los 3 subagentes se ejecutan de forma concurrente sin verse entre sí. Cada uno consulta **exclusivamente sus propias fuentes de datos reales** (Sheets/ROI/Infra para Melchior, Drive/FMEA/Constraints para Balthazar, o Markdown local `VISION.md`/Costo de oportunidad/Impacto humano para Casper) y emite su dictamen inicial (`DictamenNodo`).
+3. **Fase 2 — Careo Moderado (Mediador → Ronda 2):** `RITSUKO-0` analiza las contradicciones entre los hallazgos asimétricos (ej. *Melchior muestra ROI positivo en Sheets, pero Balthazar encontró un límite contractual en Drive*) y envía **preguntas cruzadas dirigidas** a cada nodo para una segunda ronda de réplica.
 4. **Fase 3 — Veredicto y Quórum (`2/3`):** El Mediador contabiliza los votos definitivos, registra si hubo cambios de postura entre rondas, sintetiza las condiciones obligatorias de mitigación y entrega el **Dossier Ejecutivo MAGI**.
 
 ---
@@ -53,21 +54,21 @@ magi-decision-plugin/
 ├── mcp_config.json                       # Configuración Stdio fija (.venv\Scripts\python.exe)
 ├── README.md                             # Documentación general del repositorio y plugin
 ├── .env.example                          # Plantilla de credenciales y IDs de Sheets/Drive
-├── constraints.yaml                      # Restricciones operativas, presupuestarias y de SLA
+├── constraints.yaml                      # Restricciones operativas, presupuestarias y de SLA (Balthazar-2)
 ├── pyproject.toml                        # Dependencias (google-antigravity, gspread, mcp, etc.)
 ├── mcp_server.py                         # Servidor FastMCP (deliberar_con_magi + ejecutar_herramienta_magi)
 ├── assets/
 │   └── logo.svg                          # Ícono vectorial de los 3 monolitos MAGI + RITSUKO-0
 ├── engine/
-│   └── magi_mediator.py                  # Orquestador principal con Antigravity SDK
+│   └── magi_mediator.py                  # Orquestador principal con Antigravity SDK y aislamiento por nodo
 ├── tools/
-│   ├── __init__.py                       # Exporta ALL_MAGI_TOOLS (las 9 herramientas)
-│   ├── melchior_tools.py                 # Conector Google Sheets + cálculos financieros e infra
-│   ├── balthazar_tools.py                # Conector Google Drive + auditoría FMEA y constraints
-│   ├── casper_tools.py                   # Conector Markdown local + costo de oportunidad y humano
-│   └── cli.py                            # Interfaz CLI para invocación desde Modo B
+│   ├── __init__.py
+│   ├── melchior_tools.py                 # Conector Google Sheets + cálculos financieros (Melchior-1)
+│   ├── balthazar_tools.py                # Conector Google Drive + auditoría FMEA (Balthazar-2)
+│   ├── casper_tools.py                   # Conector Markdown local + costo de oportunidad (Casper-3)
+│   └── cli.py                            # Runner CLI con validación de aislamiento (--node)
 ├── notas/
-│   └── VISION.md                         # Bitácora estratégica leída desde ALL_MAGI_TOOLS
+│   └── VISION.md                         # Bitácora estratégica leída por Casper-3
 ├── agents/                               # Subagentes declarativos del plugin (model: flash)
 │   ├── melchior-ingeniera.md
 │   ├── balthazar-madre.md
@@ -89,7 +90,7 @@ magi-decision-plugin/
 
 ## 3. Instalación y Configuración de Entorno
 
-### Paso 1: Instalar el entorno virtual, SDK y conectores
+### Paso 1: Instalar el SDK oficial de Antigravity y conectores
 ```bash
 pip install google-antigravity pydantic gspread google-auth google-api-python-client mcp pyyaml
 ```
@@ -102,7 +103,7 @@ GEMINI_API_KEY="tu_api_key_aqui"
 # Credenciales de Google Cloud (Service Account en modo solo lectura)
 GOOGLE_APPLICATION_CREDENTIALS="/ruta/segura/service-account.json"
 
-# Fuentes de datos consultables desde ALL_MAGI_TOOLS
+# Fuentes de datos exclusivas por nodo
 MAGI_MELCHIOR_SHEET_ID="1A2B3C4D5E6F7G8H9I0J"
 MAGI_BALTHAZAR_DRIVE_FOLDER_ID="1ISoLiSI2_dc6TuNQ44pFaNnKnyZZP0Ic"
 MAGI_WORKSPACE_DIR="."

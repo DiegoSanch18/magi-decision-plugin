@@ -3,34 +3,29 @@
 Expone dos herramientas MCP complementarias:
 1. `deliberar_con_magi` (Modo A): Orquesta una deliberación completa del Sistema MAGI
    (RITSUKO-0 + MELCHIOR-1, BALTHAZAR-2, CASPER-3) mediante el motor `engine.magi_mediator`.
-2. `ejecutar_herramienta_magi` (Modo B): Permite a cualquiera de los subagentes nativos
-   de Antigravity (`melchior-ingeniera`, `balthazar-madre`, `casper-mujer`) o al Mediador
-   invocar simétricamente cualquiera de las 9 herramientas de `ALL_MAGI_TOOLS`,
-   registrando la auditoría en `TRAZA_HERRAMIENTAS`.
+2. `ejecutar_herramienta_magi` (Modo B): Permite a los subagentes nativos de Antigravity
+   (`melchior-ingeniera`, `balthazar-madre`, `casper-mujer`) ejecutar sus herramientas
+   exclusivas de dominio verificando `NODE_ALLOWED_TOOLS` y registrando la auditoría
+   en `TRAZA_HERRAMIENTAS`.
 """
 
-from dataclasses import dataclass
 from typing import Any
 
 try:
     from mcp.server.fastmcp import FastMCP  # type: ignore
 except ModuleNotFoundError:
     from mcp.server.mcpserver import MCPServer as FastMCP  # type: ignore
+
 from engine.magi_mediator import (
+    NODE_ALLOWED_TOOLS,
     TRAZA_HERRAMIENTAS,
-    auditar_llamada_herramienta,
     ejecutar_deliberacion_magi,
+    normalizar_nombre_nodo,
+    validar_aislamiento_herramienta,
 )
 from tools import ALL_MAGI_TOOLS, MAGI_TOOL_REGISTRY
 
 mcp = FastMCP("magi-decision-system")
-
-
-@dataclass
-class _MCPToolEvent:
-    tool_name: str
-    tool_args: dict[str, Any]
-    agent_name: str = "mcp-client"
 
 
 @mcp.tool()
@@ -49,26 +44,44 @@ async def ejecutar_herramienta_magi(
     argumentos: dict[str, Any] | None = None,
     nodo: str = "",
 ) -> dict[str, Any]:
-    """Ejecuta cualquiera de las 9 herramientas simétricas de `ALL_MAGI_TOOLS` y registra su traza de auditoría."""
+    """Ejecuta una herramienta del Sistema MAGI validando el aislamiento de dominio por `nodo` y registrando su traza."""
     fn = MAGI_TOOL_REGISTRY.get(nombre_herramienta)
     if fn is None:
         return {
-            "error": f"Herramienta '{nombre_herramienta}' no encontrada en ALL_MAGI_TOOLS.",
+            "error": f"Herramienta '{nombre_herramienta}' no encontrada en el catálogo MAGI.",
             "herramientas_disponibles": [t.__name__ for t in ALL_MAGI_TOOLS],
         }
 
+    if nodo and nodo.strip():
+        valido, motivo = validar_aislamiento_herramienta(nodo, nombre_herramienta)
+        if not valido:
+            return {
+                "error": motivo,
+                "aislamiento_violado": True,
+                "nodo": nodo,
+                "herramienta": nombre_herramienta,
+                "herramientas_permitidas_nodo": sorted(
+                    NODE_ALLOWED_TOOLS.get(normalizar_nombre_nodo(nodo), set())
+                ),
+            }
+
     kwargs = argumentos or {}
+    nodo_registrado = normalizar_nombre_nodo(nodo) if (nodo and nodo.strip()) else "directo"
     try:
         resultado = fn(**kwargs)
-        evento = _MCPToolEvent(
-            tool_name=nombre_herramienta,
-            tool_args=kwargs,
-            agent_name=nodo or "mcp-node",
+        TRAZA_HERRAMIENTAS.append(
+            {
+                "herramienta": nombre_herramienta,
+                "args": kwargs,
+                "nodo": nodo_registrado,
+                "agente": nodo or "directo",
+                "aislamiento_valido": True,
+            }
         )
-        await auditar_llamada_herramienta(evento)
         return {
             "herramienta": nombre_herramienta,
-            "nodo": nodo or "simetrico",
+            "nodo": nodo_registrado,
+            "aislamiento_valido": True,
             "argumentos": kwargs,
             "resultado": resultado,
             "total_trazas_sesion": len(TRAZA_HERRAMIENTAS),
@@ -77,6 +90,7 @@ async def ejecutar_herramienta_magi(
         return {
             "error": f"Error al ejecutar '{nombre_herramienta}': {exc}",
             "herramienta": nombre_herramienta,
+            "nodo": nodo_registrado,
             "argumentos": kwargs,
         }
 

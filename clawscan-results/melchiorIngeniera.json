@@ -6,8 +6,8 @@
     "input": "C:\\git\\magi-decision-plugin\\skills\\melchiorIngeniera",
     "resolvedPath": "C:\\git\\magi-decision-plugin\\skills\\melchiorIngeniera"
   },
-  "startedAt": "2026-11-22T00:02:39.5613717Z",
-  "completedAt": "2026-11-22T00:02:39.5662053Z",
+  "startedAt": "2026-11-22T00:18:42.693476Z",
+  "completedAt": "2026-11-22T00:18:42.6964786Z",
   "env": {},
   "sandbox": {
     "mode": "docker",
@@ -17,8 +17,8 @@
   "scanners": {
     "clawscan-static": {
       "status": "completed",
-      "startedAt": "2026-11-22T00:02:39.5623826Z",
-      "completedAt": "2026-11-22T00:02:39.5662053Z",
+      "startedAt": "2026-11-22T00:18:42.693476Z",
+      "completedAt": "2026-11-22T00:18:42.6964786Z",
       "durationMs": 3,
       "command": [
         "clawscan-static",
@@ -79,17 +79,17 @@
           "scanned": [
             {
               "path": "SKILL.md",
-              "bytes": 4295,
-              "sha256": "5487cfa82fc9816cb73dc14f805cc593b537290976acb5028654fce8c36103a5"
+              "bytes": 3629,
+              "sha256": "a9192e727cc084024a6de91218f48b408a537cf9e9690f9f54f899c4eaec054d"
             },
             {
               "path": "README.md",
-              "bytes": 1527,
-              "sha256": "3c6c1bfe5956497d214027b2648d8b7bfa7827e88621c9392fe6cc6ad55b6974"
+              "bytes": 1625,
+              "sha256": "318a6e484fed1368c7c3dd70e4a484beb05118af31a229d518c73195936018cd"
             }
           ],
           "omitted": [],
-          "totalScannedBytes": 5822,
+          "totalScannedBytes": 5254,
           "totalOmittedBytes": 0,
           "suppressedScanned": 0,
           "suppressedOmitted": 0

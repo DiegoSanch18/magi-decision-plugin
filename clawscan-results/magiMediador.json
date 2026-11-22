@@ -6,8 +6,8 @@
     "input": "C:\\git\\magi-decision-plugin\\skills\\magiMediador",
     "resolvedPath": "C:\\git\\magi-decision-plugin\\skills\\magiMediador"
   },
-  "startedAt": "2026-11-22T00:02:39.2850736Z",
-  "completedAt": "2026-11-22T00:02:39.2899967Z",
+  "startedAt": "2026-11-22T00:18:42.4752002Z",
+  "completedAt": "2026-11-22T00:18:42.4790784Z",
   "env": {},
   "sandbox": {
     "mode": "docker",
@@ -17,9 +17,9 @@
   "scanners": {
     "clawscan-static": {
       "status": "completed",
-      "startedAt": "2026-11-22T00:02:39.2856271Z",
-      "completedAt": "2026-11-22T00:02:39.2899967Z",
-      "durationMs": 4,
+      "startedAt": "2026-11-22T00:18:42.4752002Z",
+      "completedAt": "2026-11-22T00:18:42.4790784Z",
+      "durationMs": 3,
       "command": [
         "clawscan-static",
         "C:\\git\\magi-decision-plugin\\skills\\magiMediador"
@@ -79,17 +79,17 @@
           "scanned": [
             {
               "path": "SKILL.md",
-              "bytes": 6786,
-              "sha256": "94275e1d382bb68ffd5e49f4f7f05b8c1542b6f5ac81bb33d0ca2c34b87f42a3"
+              "bytes": 7118,
+              "sha256": "d4bc9c6d3296328949508867c7aeae1b0910e45d30448cda135e066b69186795"
             },
             {
               "path": "README.md",
-              "bytes": 2317,
-              "sha256": "26f58718928979e75f554302cd6b3c62e0608c5ac3147cc498c3c6822a8e30d3"
+              "bytes": 2634,
+              "sha256": "0d8bf8a6f34d3a8fe6fdc4d1ac9b5dd76497cf57f2546df2442a56aaa9946702"
             }
           ],
           "omitted": [],
-          "totalScannedBytes": 9103,
+          "totalScannedBytes": 9752,
           "totalOmittedBytes": 0,
           "suppressedScanned": 0,
           "suppressedOmitted": 0
